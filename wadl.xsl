@@ -53,58 +53,66 @@
         <meta charset="UTF-8" />
         <xsl:call-template name="getStyle"/>
         <title><xsl:call-template name="getTitle"/></title>
+        <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet"/>
     </head>
     <body>
-    <h1><xsl:call-template name="getTitle"/></h1>
-    <xsl:call-template name="getDoc">
-        <xsl:with-param name="base" select="$g_resourcesBase"/>
-    </xsl:call-template>
-    
     <!-- Summary -->
-    <h2>Summary</h2>
-    <table>
-        <tr>
-            <th>Resource</th>
-            <th>Method</th>
-            <th>Description</th>
-        </tr>
-        <xsl:for-each select="wadl:resources/wadl:resource">
-            <xsl:call-template name="processResourceSummary">
-                <xsl:with-param name="resourceBase" select="$g_resourcesBase"/>
-                <xsl:with-param name="resourcePath" select="@path"/>
-                <xsl:with-param name="lastResource" select="position() = last()"/>
-            </xsl:call-template>
-        </xsl:for-each>
-    </table>
-    <p></p>
-    
-    <!-- Grammars -->
-    <xsl:if test="wadl:grammars/wadl:include">
-        <h2>Grammars</h2>
-        <p>
-            <xsl:for-each select="wadl:grammars/wadl:include">
-                <xsl:variable name="href" select="@href"/>
-                <a href="{$href}"><xsl:value-of select="$href"/></a>
-                <xsl:if test="position() != last()"><br/></xsl:if>  <!-- Add a spacer -->
-            </xsl:for-each>
-        </p>
-    </xsl:if>
-
-    <!-- Detail -->
-    <h2>Resources</h2>
-    <xsl:for-each select="wadl:resources">
+    <div class="fix-and-scroll navi">
+        <h1><xsl:call-template name="getTitle"/></h1>
         <xsl:call-template name="getDoc">
             <xsl:with-param name="base" select="$g_resourcesBase"/>
         </xsl:call-template>
-        <br/>
-    </xsl:for-each>
-    
-    <xsl:for-each select="wadl:resources/wadl:resource">
-        <xsl:call-template name="processResourceDetail">
-            <xsl:with-param name="resourceBase" select="$g_resourcesBase"/>
-            <xsl:with-param name="resourcePath" select="@path"/>
-        </xsl:call-template>
-    </xsl:for-each>
+
+        <h2>Summary</h2>
+        <table class="col-xs-12 table table-condensed table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>Resource</th>
+                    <th>Method and Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <xsl:for-each select="wadl:resources/wadl:resource">
+                    <xsl:call-template name="processResourceSummary">
+                        <xsl:with-param name="resourceBase" select="$g_resourcesBase"/>
+                        <xsl:with-param name="resourcePath" select="@path"/>
+                        <xsl:with-param name="lastResource" select="position() = last()"/>
+                    </xsl:call-template>
+                </xsl:for-each>
+            </tbody>
+        </table>
+        <p></p>
+
+        <!-- Grammars -->
+        <xsl:if test="wadl:grammars/wadl:include">
+            <h2>Grammars</h2>
+            <p>
+                <xsl:for-each select="wadl:grammars/wadl:include">
+                    <xsl:variable name="href" select="@href"/>
+                    <a href="{$href}"><xsl:value-of select="$href"/></a>
+                    <xsl:if test="position() != last()"><br/></xsl:if>  <!-- Add a spacer -->
+                </xsl:for-each>
+            </p>
+        </xsl:if>
+    </div>
+
+    <!-- Detail -->
+    <div class="fix-and-scroll content">
+        <h2>Resources</h2>
+        <xsl:for-each select="wadl:resources">
+            <xsl:call-template name="getDoc">
+                <xsl:with-param name="base" select="$g_resourcesBase"/>
+            </xsl:call-template>
+            <br/>
+        </xsl:for-each>
+
+        <xsl:for-each select="wadl:resources/wadl:resource">
+            <xsl:call-template name="processResourceDetail">
+                <xsl:with-param name="resourceBase" select="$g_resourcesBase"/>
+                <xsl:with-param name="resourcePath" select="@path"/>
+            </xsl:call-template>
+        </xsl:for-each>
+    </div>
 
     </body>
     </html>
@@ -120,7 +128,7 @@
     <xsl:if test="wadl:method">
         <tr>
             <!-- Resource -->
-            <td class="summary">
+            <td>
                 <xsl:variable name="id"><xsl:call-template name="getId"/></xsl:variable>
                 <a href="#{$id}">
                     <xsl:call-template name="getFullResourcePath">
@@ -129,32 +137,22 @@
                     </xsl:call-template>
                 </a>
             </td>
-            <!-- Method -->
-            <td class="summary">
+            <!-- Method and Description-->
+            <td>
                 <xsl:for-each select="wadl:method">
-                    <xsl:variable name="name" select="@name"/>
-                    <xsl:variable name="id2"><xsl:call-template name="getId"/></xsl:variable>
-                    <a href="#{$id2}"><xsl:value-of select="$name"/></a>
-                    <xsl:for-each select="wadl:doc"><br/></xsl:for-each>
-                    <xsl:if test="position() != last()"><br/></xsl:if>  <!-- Add a spacer -->
-                </xsl:for-each>
-                <br/>
-            </td>
-            <!-- Description -->
-            <td class="summary">
-                <xsl:for-each select="wadl:method">
-                    <xsl:call-template name="getDoc">
-                        <xsl:with-param name="base" select="$resourceBase"/>
-                    </xsl:call-template>
-                    <br/>
-                    <xsl:if test="position() != last()"><br/></xsl:if>  <!-- Add a spacer -->
+                    <div class="col-xs-2">
+                        <xsl:variable name="name" select="@name"/>
+                        <xsl:variable name="id2"><xsl:call-template name="getId"/></xsl:variable>
+                        <a href="#{$id2}"><xsl:value-of select="$name"/></a>
+                    </div>
+                    <div class="col-xs-10">
+                        <xsl:call-template name="getDoc">
+                            <xsl:with-param name="base" select="$resourceBase"/>
+                        </xsl:call-template>
+                    </div>
                 </xsl:for-each>
             </td>
         </tr>
-        <!-- Add separator if not the last resource -->
-        <xsl:if test="wadl:method and not($lastResource)">
-            <tr><td class="summarySeparator"></td><td class="summarySeparator"/><td class="summarySeparator"/></tr>
-        </xsl:if>
     </xsl:if>   <!-- wadl:method -->
 
     <!-- Call recursively for child resources -->
@@ -541,11 +539,6 @@
 
 <xsl:template name="getStyle">
      <style type="text/css">
-        body {
-            font-family: sans-serif;
-            font-size: 0.85em;
-            margin: 2em 2em;
-        }
         .methods {
             margin-left: 2em; 
             margin-bottom: 2em;
@@ -609,34 +602,22 @@
         tt {
             font-size: 1em;
         }
-        table {
-            margin-bottom: 0.5em;
-            border: 1px solid #E0E0E0;
+
+        .fix-and-scroll {
+            position: fixed;
+            top: 0;
+            overflow: auto;
+            bottom: 0;
         }
-        th {
-            text-align: left;
-            font-weight: normal;
-            font-size: 1em;
-            color: black;
-            background-color: #DDDDE6;
-            padding: 3px 6px;
-            border: 1px solid #B1B1B8;
+        .navi {
+            left: 0;
+            width: 40%;
+            padding: 20px;
         }
-        td {
-            padding: 3px 6px;
-            vertical-align: top;
-            background-color: #F6F6FF;
-            font-size: 0.85em;
-        }
-        p {
-            margin-top: 0em;
-            margin-bottom: 0em;
-        }
-        td.summary {
-            background-color: white;
-        }
-        td.summarySeparator {
-            padding: 1px;
+        .content {
+            right: 0;
+            width: 60%;
+            padding: 20px;
         }
     </style>
 </xsl:template>
